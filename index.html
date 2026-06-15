@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="theme-color" content="#0E1230" />
+<title>Write the Vision</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --night:#0E1230;
+    --night-2:#161B47;
+    --panel:#1B2154;
+    --panel-2:#232A66;
+    --gold:#E8B04B;
+    --gold-soft:#F0C674;
+    --amber:#D98A3D;
+    --parchment:#F7F2E7;
+    --ink:#23211A;
+    --lav:#A9AEC9;
+    --lav-dim:#737AA0;
+    --line:rgba(232,176,75,.18);
+    --red:#E2725B;
+    --ok:#7FB77E;
+    --radius:18px;
+    --safe-b:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Inter',-apple-system,system-ui,sans-serif;
+    background:
+      radial-gradient(120% 80% at 50% -10%, rgba(232,176,75,.10), transparent 55%),
+      linear-gradient(180deg,#0B0E26 0%, var(--night) 30%, var(--night-2) 100%);
+    background-attachment:fixed;
+    color:var(--parchment);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+    overscroll-behavior-y:none;
+  }
+  .app{max-width:560px;margin:0 auto;padding:0 18px calc(110px + var(--safe-b));}
+
+  /* Header */
+  header{padding:26px 2px 14px;text-align:center;position:relative;}
+  .crown{font-size:22px;letter-spacing:.3em;color:var(--gold);opacity:.9;}
+  h1{
+    font-family:'Fraunces',serif;font-weight:600;
+    font-size:30px;line-height:1.05;margin:8px 0 2px;
+    color:var(--parchment);letter-spacing:.01em;
+  }
+  .verse{
+    font-family:'Fraunces',serif;font-style:italic;font-weight:400;
+    font-size:14.5px;line-height:1.5;color:var(--gold-soft);
+    max-width:340px;margin:10px auto 0;opacity:.92;
+  }
+  .verse .ref{display:block;font-style:normal;font-size:11.5px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--lav);margin-top:7px;}
+  .menu-btn{
+    position:absolute;top:24px;right:0;width:42px;height:42px;border:none;
+    background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;
+    color:var(--gold);font-size:18px;cursor:pointer;display:grid;place-items:center;
+  }
+
+  /* Views */
+  .view{display:none;animation:fade .4s ease;}
+  .view.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  /* Capture */
+  .stage{
+    margin-top:14px;border-radius:24px;padding:30px 22px 26px;
+    background:linear-gradient(180deg, rgba(27,33,84,.55), rgba(14,18,48,.4));
+    border:1px solid var(--line);position:relative;overflow:hidden;text-align:center;
+  }
+  .dawn{
+    position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);
+    width:260px;height:260px;border-radius:50%;
+    background:radial-gradient(circle, rgba(232,176,75,.55), rgba(217,138,61,.22) 45%, transparent 70%);
+    filter:blur(8px);opacity:0;transition:opacity .6s ease;pointer-events:none;
+  }
+  .stage.live .dawn{opacity:1;animation:breathe 3.4s ease-in-out infinite;}
+  @keyframes breathe{0%,100%{transform:translate(-50%,-50%) scale(.92);}50%{transform:translate(-50%,-50%) scale(1.08);}}
+
+  .rec-btn{
+    position:relative;z-index:2;width:128px;height:128px;border-radius:50%;
+    border:none;cursor:pointer;display:grid;place-items:center;gap:0;
+    background:radial-gradient(circle at 50% 38%, #2A3170, #161B47);
+    border:1.5px solid rgba(232,176,75,.5);
+    color:var(--gold-soft);transition:transform .2s ease, box-shadow .3s ease;
+    box-shadow:0 10px 30px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .rec-btn:active{transform:scale(.96);}
+  .rec-btn .mic{font-size:40px;line-height:1;}
+  .rec-btn .lbl{font-size:12px;letter-spacing:.16em;text-transform:uppercase;margin-top:6px;color:var(--lav);}
+  .stage.live .rec-btn{
+    background:radial-gradient(circle at 50% 38%, #6A3B1F, #3A2210);
+    border-color:var(--gold);color:var(--gold-soft);
+    box-shadow:0 0 0 8px rgba(232,176,75,.10), 0 0 40px rgba(232,176,75,.35);
+  }
+  .stage.live .rec-btn .mic{animation:pulse 1.4s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+
+  .status{margin-top:18px;font-size:14px;color:var(--lav);min-height:20px;letter-spacing:.02em;}
+  .status.recording{color:var(--gold);}
+
+  .live-box{
+    margin-top:16px;text-align:left;border-radius:16px;
+    background:rgba(8,10,28,.45);border:1px solid var(--line);
+    padding:16px 16px;min-height:84px;font-size:16.5px;line-height:1.6;
+    color:var(--parchment);white-space:pre-wrap;word-break:break-word;
+  }
+  .live-box .interim{color:var(--gold-soft);opacity:.85;font-style:italic;}
+  .live-box .hint{color:var(--lav-dim);font-style:italic;}
+
+  /* Save panel */
+  .save-panel{margin-top:16px;display:none;animation:fade .35s ease;}
+  .save-panel.show{display:block;}
+  .field{margin-bottom:12px;}
+  .field label{display:block;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--lav);margin:0 0 7px 3px;}
+  input.txt, textarea.txt, select.txt{
+    width:100%;border-radius:14px;border:1px solid var(--line);
+    background:rgba(8,10,28,.5);color:var(--parchment);
+    font-family:inherit;font-size:16px;padding:13px 14px;outline:none;
+  }
+  textarea.txt{min-height:150px;resize:vertical;line-height:1.55;}
+  input.txt:focus,textarea.txt:focus,select.txt:focus{border-color:var(--gold);}
+  select.txt{appearance:none;-webkit-appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%23E8B04B'><path d='M7 10L2 4h10z'/></svg>");
+    background-repeat:no-repeat;background-position:right 14px center;padding-right:38px;}
+  .row{display:flex;gap:10px;}
+  .row>*{flex:1;}
+
+  .btn{
+    border:none;border-radius:14px;padding:14px 16px;font-family:inherit;
+    font-size:15px;font-weight:600;cursor:pointer;letter-spacing:.02em;width:100%;
+  }
+  .btn.primary{background:linear-gradient(180deg,var(--gold-soft),var(--amber));color:#2A1A06;}
+  .btn.ghost{background:rgba(255,255,255,.05);color:var(--lav);border:1px solid var(--line);}
+  .btn.primary:active,.btn.ghost:active{transform:scale(.98);}
+
+  /* Archive */
+  .search-wrap{display:flex;gap:10px;margin:16px 0 6px;}
+  .search-wrap input{flex:1;}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding:8px 0 12px;-webkit-overflow-scrolling:touch;}
+  .chips::-webkit-scrollbar{display:none;}
+  .chip{
+    flex:0 0 auto;border:1px solid var(--line);background:rgba(255,255,255,.03);
+    color:var(--lav);border-radius:999px;padding:8px 14px;font-size:13px;cursor:pointer;
+    white-space:nowrap;transition:all .2s ease;
+  }
+  .chip.on{background:var(--gold);color:#241803;border-color:var(--gold);font-weight:600;}
+
+  .year-head{font-family:'Fraunces',serif;font-size:13px;letter-spacing:.28em;
+    color:var(--gold);text-transform:uppercase;margin:24px 3px 6px;
+    border-bottom:1px solid var(--line);padding-bottom:6px;}
+  .month-head{font-family:'Fraunces',serif;font-size:20px;color:var(--parchment);
+    margin:16px 3px 8px;font-weight:600;}
+  .day-head{font-size:12px;letter-spacing:.06em;color:var(--lav);margin:14px 3px 8px;
+    text-transform:uppercase;}
+
+  .entry{
+    background:linear-gradient(180deg, rgba(27,33,84,.5), rgba(20,24,54,.4));
+    border:1px solid var(--line);border-radius:16px;padding:14px 15px;margin-bottom:10px;
+    cursor:pointer;transition:border-color .2s ease;
+  }
+  .entry:active{border-color:var(--gold);}
+  .entry .top{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+  .entry .time{font-size:12px;color:var(--gold-soft);font-variant-numeric:tabular-nums;letter-spacing:.02em;}
+  .entry .cat{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    background:rgba(232,176,75,.12);color:var(--gold);padding:3px 9px;border-radius:999px;margin-left:auto;}
+  .entry .ttl{font-family:'Fraunces',serif;font-size:17px;color:var(--parchment);margin:0 0 4px;font-weight:600;line-height:1.2;}
+  .entry .snip{font-size:14px;color:var(--lav);line-height:1.5;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+
+  .empty{text-align:center;padding:50px 20px;color:var(--lav-dim);}
+  .empty .big{font-family:'Fraunces',serif;font-style:italic;font-size:18px;color:var(--lav);margin-bottom:8px;}
+
+  /* Bottom nav */
+  nav{
+    position:fixed;left:0;right:0;bottom:0;z-index:30;
+    background:linear-gradient(180deg, rgba(11,14,38,.4), rgba(11,14,38,.96));
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border-top:1px solid var(--line);
+    padding:10px 0 calc(10px + var(--safe-b));
+    display:flex;justify-content:center;gap:8px;
+  }
+  .nav-btn{
+    background:none;border:none;color:var(--lav-dim);font-family:inherit;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 26px;border-radius:14px;
+  }
+  .nav-btn .ic{font-size:21px;}
+  .nav-btn .nm{font-size:11px;letter-spacing:.08em;}
+  .nav-btn.on{color:var(--gold);}
+
+  /* Sheet (menu + entry edit) */
+  .scrim{position:fixed;inset:0;background:rgba(4,6,18,.6);backdrop-filter:blur(2px);
+    z-index:50;display:none;}
+  .scrim.show{display:block;}
+  .sheet{
+    position:fixed;left:0;right:0;bottom:0;z-index:60;max-width:560px;margin:0 auto;
+    background:linear-gradient(180deg,#1B2154,#12163A);
+    border-radius:24px 24px 0 0;border-top:1px solid var(--line);
+    padding:10px 20px calc(26px + var(--safe-b));transform:translateY(100%);
+    transition:transform .3s cubic-bezier(.4,0,.2,1);max-height:88vh;overflow-y:auto;
+  }
+  .sheet.show{transform:translateY(0);}
+  .grab{width:42px;height:4px;border-radius:2px;background:var(--lav-dim);margin:6px auto 16px;}
+  .sheet h3{font-family:'Fraunces',serif;font-size:20px;margin:0 0 4px;color:var(--parchment);font-weight:600;}
+  .sheet .sub{font-size:13px;color:var(--lav);margin:0 0 16px;}
+  .sheet-row{display:flex;align-items:center;gap:14px;padding:15px 4px;border-top:1px solid var(--line);
+    cursor:pointer;font-size:15px;color:var(--parchment);}
+  .sheet-row .ic{font-size:20px;width:26px;text-align:center;color:var(--gold);}
+  .sheet-row.danger{color:var(--red);}
+  .sheet-row.danger .ic{color:var(--red);}
+  .meta-line{font-size:12px;color:var(--gold-soft);margin-bottom:12px;letter-spacing:.02em;}
+
+  .toast{position:fixed;left:50%;bottom:calc(96px + var(--safe-b));transform:translateX(-50%) translateY(20px);
+    background:var(--gold);color:#241803;padding:11px 20px;border-radius:999px;font-size:14px;font-weight:600;
+    opacity:0;transition:all .3s ease;z-index:80;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.4);}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+    <div class="crown">✦</div>
+    <h1>Write the Vision</h1>
+    <p class="verse">“Write the vision, and make it plain upon tables, that he may run that readeth it.”
+      <span class="ref">Habakkuk 2:2</span></p>
+  </header>
+
+  <!-- CAPTURE VIEW -->
+  <section class="view active" id="captureView">
+    <div class="stage" id="stage">
+      <div class="dawn"></div>
+      <button class="rec-btn" id="recBtn" aria-label="Start recording">
+        <span class="mic" id="micIcon">🎙️</span>
+        <span class="lbl" id="recLbl">Tap to speak</span>
+      </button>
+      <div class="status" id="status">Tap the mic and speak what's on your heart.</div>
+      <div class="live-box" id="liveBox"><span class="hint">Your words will appear here as you speak…</span></div>
+    </div>
+
+    <div class="save-panel" id="savePanel">
+      <div class="field">
+        <label>Title</label>
+        <input class="txt" id="titleIn" placeholder="A short name for this note" />
+      </div>
+      <div class="field">
+        <label>Category</label>
+        <select class="txt" id="catIn">
+          <option>The Word</option>
+          <option>Kids</option>
+          <option>Build Ideas</option>
+          <option>Prayer</option>
+          <option>Sermon</option>
+          <option>Personal</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Note</label>
+        <textarea class="txt" id="textIn" placeholder="Your transcribed words…"></textarea>
+      </div>
+      <div class="row">
+        <button class="btn ghost" id="discardBtn">Discard</button>
+        <button class="btn primary" id="saveBtn">Save note</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARCHIVE VIEW -->
+  <section class="view" id="archiveView">
+    <div class="search-wrap">
+      <input class="txt" id="searchIn" placeholder="Search your notes…" />
+    </div>
+    <div class="chips" id="chips"></div>
+    <div id="archiveList"></div>
+  </section>
+</div>
+
+<!-- Bottom nav -->
+<nav>
+  <button class="nav-btn on" id="navCapture"><span class="ic">🎙️</span><span class="nm">Capture</span></button>
+  <button class="nav-btn" id="navArchive"><span class="ic">📜</span><span class="nm">Archive</span></button>
+</nav>
+
+<!-- Menu sheet -->
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="menuSheet">
+  <div class="grab"></div>
+  <h3>Vision Tools</h3>
+  <p class="sub" id="countLine">No notes yet.</p>
+  <div class="sheet-row" id="backupRow"><span class="ic">⬇️</span><span>Back up all notes (download)</span></div>
+  <div class="sheet-row" id="restoreRow"><span class="ic">⬆️</span><span>Restore from backup file</span></div>
+  <div class="sheet-row" id="exportTxtRow"><span class="ic">📄</span><span>Export as readable text</span></div>
+  <input type="file" id="restoreFile" accept="application/json" style="display:none" />
+</div>
+
+<!-- Entry edit sheet -->
+<div class="sheet" id="editSheet">
+  <div class="grab"></div>
+  <div class="meta-line" id="editMeta"></div>
+  <div class="field">
+    <label>Title</label>
+    <input class="txt" id="eTitle" />
+  </div>
+  <div class="field">
+    <label>Category</label>
+    <select class="txt" id="eCat">
+      <option>The Word</option><option>Kids</option><option>Build Ideas</option>
+      <option>Prayer</option><option>Sermon</option><option>Personal</option><option>Other</option>
+    </select>
+  </div>
+  <div class="field">
+    <label>Note</label>
+    <textarea class="txt" id="eText"></textarea>
+  </div>
+  <div class="row" style="margin-bottom:12px;">
+    <button class="btn ghost" id="eClose">Close</button>
+    <button class="btn primary" id="eSave">Save changes</button>
+  </div>
+  <div class="sheet-row danger" id="eDelete"><span class="ic">🗑️</span><span>Delete this note</span></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- Storage (defensive: works on GitHub Pages, degrades gracefully elsewhere) ---------- */
+  var KEY = "wtv_notes_v1";
+  var memCache = null; // in-memory fallback if localStorage unavailable
+  function loadNotes(){
+    if(memCache) return memCache;
+    try{
+      var raw = localStorage.getItem(KEY);
+      memCache = raw ? JSON.parse(raw) : [];
+    }catch(e){ memCache = memCache || []; }
+    return memCache;
+  }
+  function saveNotes(arr){
+    memCache = arr;
+    try{ localStorage.setItem(KEY, JSON.stringify(arr)); }catch(e){ /* preview / private mode */ }
+  }
+
+  /* ---------- Elements ---------- */
+  var $ = function(id){ return document.getElementById(id); };
+  var stage=$("stage"), recBtn=$("recBtn"), micIcon=$("micIcon"), recLbl=$("recLbl"),
+      status=$("status"), liveBox=$("liveBox"), savePanel=$("savePanel"),
+      titleIn=$("titleIn"), catIn=$("catIn"), textIn=$("textIn"),
+      saveBtn=$("saveBtn"), discardBtn=$("discardBtn"),
+      searchIn=$("searchIn"), chips=$("chips"), archiveList=$("archiveList");
+
+  /* ---------- Navigation ---------- */
+  function show(view){
+    $("captureView").classList.toggle("active", view==="capture");
+    $("archiveView").classList.toggle("active", view==="archive");
+    $("navCapture").classList.toggle("on", view==="capture");
+    $("navArchive").classList.toggle("on", view==="archive");
+    if(view==="archive") renderArchive();
+  }
+  $("navCapture").onclick=function(){ show("capture"); };
+  $("navArchive").onclick=function(){ show("archive"); };
+
+  /* ---------- Speech recognition ---------- */
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var recog=null, isRecording=false, committed="";
+
+  function setupRecognition(){
+    if(!SR) return null;
+    var r = new SR();
+    r.continuous = true;
+    r.interimResults = true;
+    r.lang = "en-US";
+    r.onresult = function(e){
+      var interim="";
+      for(var i=e.resultIndex; i<e.results.length; i++){
+        var t = e.results[i][0].transcript;
+        if(e.results[i].isFinal){ committed += (committed && !/\s$/.test(committed) ? " " : "") + t.trim(); }
+        else interim += t;
+      }
+      renderLive(interim);
+    };
+    r.onerror = function(e){
+      if(e.error==="not-allowed" || e.error==="service-not-allowed"){
+        stopRecording();
+        status.textContent="Microphone blocked. Allow mic access in your browser settings.";
+        status.classList.remove("recording");
+      } else if(e.error==="network"){
+        status.textContent="Transcription needs an internet connection.";
+      }
+      // 'no-speech' / 'aborted' are ignored — onend will restart if still recording
+    };
+    r.onend = function(){
+      if(isRecording){
+        try{ r.start(); }catch(e){ /* restart guard */ }
+      }
+    };
+    return r;
+  }
+
+  function renderLive(interim){
+    var safe = function(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); };
+    if(!committed && !interim){
+      liveBox.innerHTML='<span class="hint">Listening… speak naturally.</span>';
+      return;
+    }
+    liveBox.innerHTML = safe(committed) + (interim ? ' <span class="interim">'+safe(interim)+'</span>' : '');
+    liveBox.scrollTop = liveBox.scrollHeight;
+  }
+
+  function startRecording(){
+    if(!SR){
+      // No speech support — let them type instead
+      status.textContent="Voice typing isn't available in this browser. You can type your note below.";
+      openSavePanel("");
+      return;
+    }
+    committed="";
+    if(!recog) recog = setupRecognition();
+    try{ recog.start(); }
+    catch(e){ /* already started */ }
+    isRecording=true;
+    stage.classList.add("live");
+    micIcon.textContent="⏹";
+    recLbl.textContent="Tap to stop";
+    recBtn.setAttribute("aria-label","Stop recording");
+    status.textContent="Recording — speak your heart…";
+    status.classList.add("recording");
+    savePanel.classList.remove("show");
+    renderLive("");
+  }
+
+  function stopRecording(){
+    isRecording=false;
+    if(recog){ try{ recog.stop(); }catch(e){} }
+    stage.classList.remove("live");
+    micIcon.textContent="🎙️";
+    recLbl.textContent="Tap to speak";
+    recBtn.setAttribute("aria-label","Start recording");
+    status.classList.remove("recording");
+    if(committed.trim()){
+      status.textContent="Captured. Review and save below.";
+      openSavePanel(committed.trim());
+    } else {
+      status.textContent="Nothing captured. Tap the mic to try again.";
+    }
+  }
+
+  recBtn.onclick=function(){ isRecording ? stopRecording() : startRecording(); };
+
+  /* ---------- Save panel ---------- */
+  function openSavePanel(text){
+    textIn.value = text;
+    titleIn.value = suggestTitle(text);
+    savePanel.classList.add("show");
+    setTimeout(function(){ savePanel.scrollIntoView({behavior:"smooth", block:"nearest"}); }, 120);
+  }
+  function suggestTitle(text){
+    if(!text) return "";
+    var firstSentence = text.split(/[.!?\n]/)[0].trim();
+    var words = firstSentence.split(/\s+/).slice(0,6).join(" ");
+    return words.charAt(0).toUpperCase()+words.slice(1);
+  }
+  discardBtn.onclick=function(){
+    savePanel.classList.remove("show");
+    committed="";
+    liveBox.innerHTML='<span class="hint">Your words will appear here as you speak…</span>';
+    status.textContent="Discarded. Tap the mic when you're ready.";
+  };
+  saveBtn.onclick=function(){
+    var text = textIn.value.trim();
+    if(!text){ toast("Add some words first"); return; }
+    var notes = loadNotes();
+    notes.push({
+      id: Date.now()+"-"+Math.random().toString(36).slice(2,7),
+      ts: new Date().toISOString(),
+      title: titleIn.value.trim() || suggestTitle(text) || "Untitled note",
+      cat: catIn.value,
+      text: text
+    });
+    saveNotes(notes);
+    savePanel.classList.remove("show");
+    committed="";
+    titleIn.value=""; textIn.value="";
+    liveBox.innerHTML='<span class="hint">Your words will appear here as you speak…</span>';
+    status.textContent="Saved to your archive. ✦";
+    toast("Vision written ✦");
+  };
+
+  /* ---------- Archive ---------- */
+  var activeCat="All";
+  var CATS=["All","The Word","Kids","Build Ideas","Prayer","Sermon","Personal","Other"];
+
+  function buildChips(){
+    chips.innerHTML="";
+    CATS.forEach(function(c){
+      var b=document.createElement("button");
+      b.className="chip"+(c===activeCat?" on":"");
+      b.textContent=c;
+      b.onclick=function(){ activeCat=c; buildChips(); renderArchive(); };
+      chips.appendChild(b);
+    });
+  }
+
+  var MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var DAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+  function renderArchive(){
+    buildChips();
+    var notes = loadNotes().slice();
+    var q = (searchIn.value||"").toLowerCase().trim();
+
+    notes = notes.filter(function(n){
+      if(activeCat!=="All" && n.cat!==activeCat) return false;
+      if(q && (n.title+" "+n.text+" "+n.cat).toLowerCase().indexOf(q)<0) return false;
+      return true;
+    });
+    notes.sort(function(a,b){ return new Date(b.ts)-new Date(a.ts); });
+
+    if(notes.length===0){
+      archiveList.innerHTML='<div class="empty"><div class="big">'+
+        (q||activeCat!=="All" ? "No notes match that." : "Your tablets are blank.")+'</div>'+
+        (q||activeCat!=="All" ? "Try another search or category." : "Capture a thought and it will appear here, filed by date.")+'</div>';
+      return;
+    }
+
+    // Group: year -> month -> day
+    var html="", lastY=null, lastM=null, lastD=null;
+    notes.forEach(function(n){
+      var d=new Date(n.ts);
+      var y=d.getFullYear(), m=d.getMonth(), day=d.getDate();
+      if(y!==lastY){ html+='<div class="year-head">'+y+'</div>'; lastY=y; lastM=null; lastD=null; }
+      if(m!==lastM){ html+='<div class="month-head">'+MONTHS[m]+'</div>'; lastM=m; lastD=null; }
+      if(day!==lastD){ html+='<div class="day-head">'+DAYS[d.getDay()]+', '+MONTHS[m].slice(0,3)+' '+day+'</div>'; lastD=day; }
+      var time=d.toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+      html+='<div class="entry" data-id="'+n.id+'">'+
+        '<div class="top"><span class="time">'+time+'</span><span class="cat">'+esc(n.cat)+'</span></div>'+
+        '<div class="ttl">'+esc(n.title)+'</div>'+
+        '<div class="snip">'+esc(n.text)+'</div></div>';
+    });
+    archiveList.innerHTML=html;
+
+    Array.prototype.forEach.call(archiveList.querySelectorAll(".entry"), function(el){
+      el.onclick=function(){ openEdit(el.getAttribute("data-id")); };
+    });
+  }
+  function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  searchIn.oninput=function(){ renderArchive(); };
+
+  /* ---------- Edit sheet ---------- */
+  var editingId=null;
+  function openEdit(id){
+    var n = loadNotes().filter(function(x){return x.id===id;})[0];
+    if(!n) return;
+    editingId=id;
+    var d=new Date(n.ts);
+    $("editMeta").textContent = DAYS[d.getDay()]+", "+MONTHS[d.getMonth()]+" "+d.getDate()+", "+d.getFullYear()+
+      " · "+d.toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+    $("eTitle").value=n.title; $("eCat").value=n.cat; $("eText").value=n.text;
+    openSheet("editSheet");
+  }
+  $("eSave").onclick=function(){
+    var notes=loadNotes();
+    for(var i=0;i<notes.length;i++){
+      if(notes[i].id===editingId){
+        notes[i].title=$("eTitle").value.trim()||"Untitled note";
+        notes[i].cat=$("eCat").value;
+        notes[i].text=$("eText").value.trim();
+        break;
+      }
+    }
+    saveNotes(notes); closeSheets(); renderArchive(); toast("Updated ✦");
+  };
+  $("eClose").onclick=closeSheets;
+  $("eDelete").onclick=function(){
+    if(!confirm("Delete this note? This cannot be undone.")) return;
+    saveNotes(loadNotes().filter(function(x){return x.id!==editingId;}));
+    closeSheets(); renderArchive(); toast("Deleted");
+  };
+
+  /* ---------- Menu / backup ---------- */
+  $("menuBtn").onclick=function(){
+    var n=loadNotes();
+    $("countLine").textContent = n.length===0 ? "No notes yet." :
+      n.length+" note"+(n.length>1?"s":"")+" saved.";
+    openSheet("menuSheet");
+  };
+  $("backupRow").onclick=function(){
+    var data=JSON.stringify({app:"write-the-vision", version:1, exported:new Date().toISOString(), notes:loadNotes()}, null, 2);
+    download("write-the-vision-backup-"+stamp()+".json", data, "application/json");
+    closeSheets(); toast("Backup downloaded");
+  };
+  $("exportTxtRow").onclick=function(){
+    var notes=loadNotes().slice().sort(function(a,b){return new Date(a.ts)-new Date(b.ts);});
+    if(notes.length===0){ toast("Nothing to export"); return; }
+    var out="WRITE THE VISION — My Notes\n\"Write the vision, and make it plain.\" — Habakkuk 2:2\n\n";
+    notes.forEach(function(n){
+      var d=new Date(n.ts);
+      out+="["+DAYS[d.getDay()]+", "+MONTHS[d.getMonth()]+" "+d.getDate()+", "+d.getFullYear()+
+        " "+d.toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})+"]  ("+n.cat+")\n";
+      out+=n.title+"\n"+n.text+"\n\n";
+    });
+    download("write-the-vision-"+stamp()+".txt", out, "text/plain");
+    closeSheets(); toast("Text exported");
+  };
+  $("restoreRow").onclick=function(){ $("restoreFile").click(); };
+  $("restoreFile").onchange=function(e){
+    var file=e.target.files[0]; if(!file) return;
+    var fr=new FileReader();
+    fr.onload=function(){
+      try{
+        var parsed=JSON.parse(fr.result);
+        var incoming = parsed.notes || parsed;
+        if(!Array.isArray(incoming)) throw new Error("bad");
+        var existing=loadNotes(), ids={};
+        existing.forEach(function(n){ ids[n.id]=true; });
+        var added=0;
+        incoming.forEach(function(n){ if(n && n.id && !ids[n.id]){ existing.push(n); added++; } });
+        saveNotes(existing); closeSheets(); renderArchive();
+        toast(added>0 ? "Restored "+added+" note"+(added>1?"s":"") : "Already up to date");
+      }catch(err){ toast("Couldn't read that file"); }
+    };
+    fr.readAsText(file);
+    e.target.value="";
+  };
+
+  function download(name, content, type){
+    var blob=new Blob([content], {type:type});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement("a");
+    a.href=url; a.download=name; document.body.appendChild(a); a.click();
+    setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+  }
+  function stamp(){
+    var d=new Date();
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  }
+
+  /* ---------- Sheets ---------- */
+  function openSheet(id){ $("scrim").classList.add("show"); $(id).classList.add("show"); }
+  function closeSheets(){
+    $("scrim").classList.remove("show");
+    $("menuSheet").classList.remove("show");
+    $("editSheet").classList.remove("show");
+    editingId=null;
+  }
+  $("scrim").onclick=closeSheets;
+
+  /* ---------- Toast ---------- */
+  var toastTimer=null;
+  function toast(msg){
+    var t=$("toast"); t.textContent=msg; t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer=setTimeout(function(){ t.classList.remove("show"); }, 2200);
+  }
+
+  /* ---------- Init ---------- */
+  if(!SR){
+    status.textContent="Tip: open this on your iPhone in Safari for voice typing. You can still type notes here.";
+  }
+  buildChips();
+})();
+</script>
+</body>
+</html>
